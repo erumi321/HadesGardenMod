@@ -1,0 +1,29 @@
+{
+  Texts = [
+	"_append"
+	{
+		Id = "GardeningWithMomModMainMenuTitle"
+		DisplayName = "Garden Box"
+	}
+	{
+		Id = "GardeningWithMomModMainMenuFlavorText1"
+		DisplayName = "Earthy"
+	}
+	{
+		Id = "GardeningWithMomModMainMenuFlavorText2"
+		DisplayName = "Smells Like The Surface"
+	}
+	{
+		Id = "GardeningWithMomModMainMenuFlavorText3"
+		DisplayName = "A Beuatiful Array of Flowers and Plants"
+	}
+	{
+		Id = "GardeningWithMomModMainMenuFlavorText4"
+		DisplayName = "The Prince is Not Scared to Get His Hands Dirty in Comabt, and in Gardeining too!"
+	}
+	{
+		Id = "GardeningWithMomModMainMenuSubheader"
+		DisplayName = "A planter box gifted to the prince to grow plants and bring some life to the palace of the dead."
+	}
+	]    
+}
