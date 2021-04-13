@@ -25,5 +25,9 @@
 		Id = "GardeningWithMomModMainMenuSubheader"
 		DisplayName = "A planter box gifted to the prince to grow plants and bring some life to the palace of the dead."
 	}
+	{
+      Id = "GardeningWithMomOpenGardenMenu"
+      DisplayName = "{I} Garden"
+    }
 	]    
 }

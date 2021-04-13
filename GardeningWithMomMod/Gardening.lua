@@ -2,34 +2,29 @@ ModUtil.RegisterMod("GardeningWithMom")
 GardeningWithMom = {
 
 }
-local mod = "GardeningWithMom"
 
-local obsName = "ExitDoor"
-local obsBase = 556697
-local obsOffset = {X = 0, Y = 350}
 ModUtil.WrapBaseFunction( "SetupMap", function(baseFunc)
-	local ret = baseFunc
 	if GetMapName({}) == "DeathArea" then
 		ObstacleData.ExitDoor = {
-			Name = "GardenBox",
+			Name = "ExitToGreece",
 			InteractDistance = 350,
-			UseText = "UseGhostAdmin",
+			UseText = "UseFinalBossDoor",
 			OnUsedFunctionName = "GardeningWithMom.LoadGreece",
 			AnimOffsetZ = 300,
 		}
 	elseif GetMapName({}) == "E_Story01" then
 		ObstacleData.ExitDoor = {
-			Name = "GardenBox",
+			Name = "ExitToHouse",
 			InteractDistance = 350,
-			UseText = "UseGhostAdmin",
+			UseText = "UseFinalBossDoor",
 			OnUsedFunctionName = "SurfaceKillHero",
 			OnUsedFunctionArgs = { WaitTime = 0, MusicEndTime = 60 },
 			AnimOffsetZ = 300,
 		}
 		ObstacleData.ElysiumPlanter01 = {
-			Name = "GardenBox",
+			Name = "MomInteractOpenGardenBox",
 			InteractDistance = 350,
-			UseText = "UseGhostAdmin",
+			UseText = "GardeningWithMomOpenGardenMenu",
 			OnUsedFunctionName = "GardeningWithMom.OpenMenu",
 			AnimOffsetZ = 300,
 		}
@@ -95,7 +90,7 @@ ModUtil.WrapBaseFunction( "SetupMap", function(baseFunc)
 			Material = "StoneObstacle",
 		}
 	end
-	return ret()
+	return baseFunc()
 end)
 --ReadOnly, DONT MODIFY EVER
 local PlantData = {
@@ -365,24 +360,21 @@ GardeningWithMomGardenPlot = {
 DeathLoopData.DeathArea.ObstacleData[555708] = {
 
 }
-local targetId2
 OnAnyLoad{function(triggerArgs)
 	if GetMapName({}) == "DeathArea" then
-		DebugPrint({Text = "@"..mod.." Trying to create obstacle " .. obsName .. " at Base Obstacle Id: ".. obsBase .." Offset: (" .. obsOffset.X .. ", " .. obsOffset.Y .. ")"})
-		local targetId = SpawnObstacle({ Name = obsName, Group = "Standing", DestinationId = obsBase, OffsetX = obsOffset.X, OffsetY = obsOffset.Y })
-		DebugPrint({Text = targetId})
-		SetScale({ Id = targetId, Fraction = 1.6 })
-		AngleTowardTarget({ Id = targetId, DestinationId = 556697 })
+		DebugPrint({Text = "@GardeningWithMom Trying to create ExitDoor at Base Obstacle Id: 556697 with an Offset: (0, 350)"})
+		local exitId = SpawnObstacle({ Name = "ExitDoor", Group = "Standing", DestinationId = 556697, OffsetX =0, OffsetY = 350 })
+		SetScale({ Id = exitId, Fraction = 1.6 })
+		AngleTowardTarget({ Id = exitId, DestinationId = 556697 })
 	end
 	if GetMapName({}) == "E_Story01" then
-		DebugPrint({Text = "@"..mod.." Trying to create obstacle " .. obsName .. " at Base Obstacle Id: ".. obsBase .." Offset: (" .. obsOffset.X .. ", " .. obsOffset.Y .. ")"})
-		local targetId = SpawnObstacle({ Name = "ElysiumPlanter01", Group = "Standing", DestinationId = CurrentRun.Hero.ObjectId, OffsetX = 3700, OffsetY = -2750 })
-		DebugPrint({Text = targetId})
-		SetScale({ Id = targetId, Fraction = 0 })
-		DebugPrint({Text = "@"..mod.." Trying to create obstacle " .. obsName .. " at Base Obstacle Id: ".. obsBase .." Offset: (" .. obsOffset.X .. ", " .. obsOffset.Y .. ")"})
-		targetId2 = SpawnObstacle({ Name = obsName, Group = "Standing", DestinationId = CurrentRun.Hero.ObjectId, OffsetX = 0,  OffsetY = 0 })
-		DebugPrint({Text = targetId2})
-		SetScale({ Id = targetId2, Fraction = 1.6 })
+		DebugPrint({Text = "@GardeningWithMom Trying to create obstacle MomInteractPoint at Base Obstacle Id: " .. CurrentRun.Hero.ObjectId .. " Offset: (3700, -2750)"})
+		local momInteractId = SpawnObstacle({ Name = "ElysiumPlanter01", Group = "Standing", DestinationId = CurrentRun.Hero.ObjectId, OffsetX = 3700, OffsetY = -2750 })
+		SetScale({ Id = momInteractId, Fraction = 0 })
+
+		DebugPrint({Text = "@GardeningWithMom Trying to create obstacle ExitDoor at Base Obstacle Id: ".. CurrentRun.Hero.ObjectId  .. " Offset: (0, 0)"})
+		local exitId = SpawnObstacle({ Name = "ExitDoor", Group = "Standing", DestinationId = CurrentRun.Hero.ObjectId, OffsetX = 0,  OffsetY = 0 })
+		SetScale({ Id = exitId, Fraction = 1.6 })
 	end
 	--local obstacleName = "TartarusRubble02"
 	--local obstacleId = SpawnObstacle({ Name = obstacleName, DestinationId = desId, OffsetX = offsetX, OffsetY = offsetY, ForceToValidLocation = true, SkipIfBlocked = true, Group = "Standing", })
@@ -591,8 +583,18 @@ OnAnyLoad{function(triggerArgs)
 end}
 
 function GardeningWithMom.LoadGreece()
-	EncounterData.Story_Persephone_01.MaxAppearancesThisBiome = nil
-	LeaveRoomWithNoDoor("", { NextMap = "E_Story01", ObjectId = 552607 })
+	thread(function ()
+		RoomSetData.Surface.E_Story01.DistanceTriggers = {}
+		RoomSetData.Surface.E_Story01.LegalEncounters = { "Surface" }
+		RoomSetData.Surface.E_Story01.LegalEncountersDictionary = { ["Surface"] = true}
+		LeaveRoomWithNoDoor("", { NextMap = "E_Story01", ObjectId = 552607 })
+		ActivatePrePlaced("GardeningWithMom",{
+			FractionMin = 1.0, FractionMax = 1.0,
+			LegalTypes = { "NPC_Persephone_01" },
+		})
+		UseableOff({Id = 559274})
+	end)
+
 end
 
 function GardeningWithMom.LoadHouse()
